@@ -1,2 +1,2 @@
 # smart-home-automation
-Smart home automation via ARM M7 Based process running RT-Thread OS
+Smart home automation via ARM M7 Based processor running RT-Thread OS
