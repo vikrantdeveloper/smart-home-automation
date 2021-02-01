@@ -73,14 +73,18 @@ static void thread1_entry(void* parameter)
 
 static void thread2_entry(void* parameter)
 {
-    // handles the PIR values
-    if(rt_pin_read(PIR_PIN) == 1)
+    while(1)
     {
-        led_notification = 1;
-        relay_handle = 1;
-    }
-    else{
-        led_notification = 0;
+        // handles the PIR values
+        if(rt_pin_read(PIR_PIN) == 1)
+        {
+            led_notification = 1;
+            relay_handle = 1;
+        }
+        else{
+            led_notification = 0;
+        }
+        rt_thread_mdelay(100);
     }
 }
 static void thread3_entry(void* parameter)
