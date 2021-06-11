@@ -9,6 +9,8 @@
  * 2021-01-19     RT-Thread    first version
  */
 
+
+
 #include <rtthread.h>
 #define DBG_TAG "main"
 #define DBG_LVL DBG_LOG
@@ -36,12 +38,12 @@ static char thread3_stack[THREAD_STACK_SIZE];
 static rt_uint8_t led_notification = 0;
 static rt_uint8_t relay_handle = 0;
 
-static void initialise()
+static void pin_initialise()
 {
-    rt_pin_mode(LED0_PIN, PIN_MODE_OUTPUT);
-    rt_pin_mode(LED1_PIN, PIN_MODE_OUTPUT);
+    rt_pin_mode(LED0_PIN,  PIN_MODE_OUTPUT);
+    rt_pin_mode(LED1_PIN,  PIN_MODE_OUTPUT);
     rt_pin_mode(RELAY_PIN, PIN_MODE_OUTPUT);
-    rt_pin_mode(PIR_PIN, PIN_MODE_INPUT);
+    rt_pin_mode(PIR_PIN,   PIN_MODE_INPUT);
 }
 
 static void uart_handling()
@@ -51,22 +53,21 @@ static void uart_handling()
 
 static void thread1_entry(void* parameter)
 {
-    // toggles the LED as per the PIR values
     while (1)
         {
             if(led_notification == 1){
                 rt_pin_write(LED1_PIN, PIN_HIGH);
-                rt_thread_mdelay(1000);
-
+                rt_thread_mdelay(500);
                 rt_pin_write(LED1_PIN, PIN_LOW);
-                rt_thread_mdelay(1000);
+                rt_thread_mdelay(500);
+                relay_handle = 1;
             }
             else if(led_notification == 0){
                 rt_pin_write(LED0_PIN, PIN_HIGH);
-                rt_thread_mdelay(1000);
-
+                rt_thread_mdelay(500);
                 rt_pin_write(LED0_PIN, PIN_LOW);
-                rt_thread_mdelay(1000);
+                rt_thread_mdelay(500);
+                relay_handle = 0;
             }
         }
 }
@@ -77,26 +78,28 @@ static void thread2_entry(void* parameter)
     {
         // handles the PIR values
         if(rt_pin_read(PIR_PIN) == 1)
-        {
             led_notification = 1;
-            relay_handle = 1;
-        }
-        else{
+        else
             led_notification = 0;
-        }
         rt_thread_mdelay(100);
     }
 }
 static void thread3_entry(void* parameter)
 {
-        if(relay_handle == 1){
-            rt_pin_write(RELAY_PIN, PIN_HIGH);
-            rt_thread_mdelay(500);
-            relay_handle = 0;
-        }
-        if(relay_handle == 0){
+    while(1)
+    {
+        if(relay_handle == 1)
+        {
             rt_pin_write(RELAY_PIN, PIN_LOW);
+            rt_thread_mdelay(10);
         }
+        else if(relay_handle == 0)
+        {
+            rt_pin_write(RELAY_PIN, PIN_HIGH);
+            rt_thread_mdelay(10);
+        }
+        rt_thread_mdelay(1000);
+    }
 }
 
 // Setting thread Priority
@@ -135,7 +138,7 @@ int main(void)
 {
 
     // Initialise the pin configuration
-    initialise();
+    pin_initialise();
 
     // LED notification thread
     rt_thread_init(&thread1,"t1",thread1_entry, RT_NULL, &thread1_stack[0], sizeof(thread1_stack),THREAD_PRIORITY + 1, THREAD_TIMESLICE);
