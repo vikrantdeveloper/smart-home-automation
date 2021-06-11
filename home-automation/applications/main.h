@@ -13,12 +13,14 @@
 /// PIN HANDLING ///
 #define LED0_PIN               GET_PIN(B, 14)  // RED LED
 #define LED1_PIN               GET_PIN(B, 7)   // BLUE LED
-#define PIR_PIN                GET_PIN(D, 7)   // PIR PIN
-#define RELAY_PIN              GET_PIN(A, 6)
+#define PIR_PIN                GET_PIN(G, 9)   // PIR PIN
+#define RELAY_PIN              GET_PIN(G, 14)   // RELAY PIN
 
 // THREAD HANDLING ///
 #define THREAD_STACK_SIZE      1024
 #define THREAD_TIMESLICE       500
+
+
 #define THREAD_PRIORITY        1
 
 // Handling data over uart
